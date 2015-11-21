@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">MapExample</string>
     <string name="title_activity_maps">Map</string>
-    <string name="button">See the best spots in your area</string>
+    <string name="button">See the top spots in town</string>
 </resources>
