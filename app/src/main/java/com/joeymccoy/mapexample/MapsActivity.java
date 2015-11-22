@@ -3,8 +3,10 @@ package com.joeymccoy.mapexample;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -18,6 +20,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -128,6 +131,7 @@ public class MapsActivity extends FragmentActivity implements
      * method in {@link #onResume()} to guarantee that it will be called.
      */
     private void setUpMapIfNeeded() {
+
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
@@ -138,6 +142,7 @@ public class MapsActivity extends FragmentActivity implements
                 //setUpMap();
             }
         }
+
     }
 
     @Override
@@ -211,6 +216,19 @@ public class MapsActivity extends FragmentActivity implements
 
         mMap.addMarker(options);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
+        //Zooms in on user's current location
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(latLng)
+                .zoom(8)                   // Sets the zoom
+                .bearing(90)                // Sets the orientation of the camera to east
+                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
+                .build();                   // Creates a CameraPosition from the builder
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        //Tells the user their current location in the form of a toast
+        Toast.makeText(getApplicationContext(),
+                String.valueOf("Current location: " + currentLatitude + "," + currentLongitude),
+                Toast.LENGTH_LONG).show();
 
         //Added to find the exact latitude and longitude
         Log.d("User's current Lat = ", Double.toString(currentLatitude));
