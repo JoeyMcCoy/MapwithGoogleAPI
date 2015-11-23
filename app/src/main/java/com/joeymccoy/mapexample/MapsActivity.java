@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -62,7 +63,8 @@ public class MapsActivity extends AppCompatActivity implements
         //Action bar
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
-
+        ActionBar supportActionBar = getSupportActionBar();
+        supportActionBar.setLogo(R.drawable.ic_app_icon);
 
 
         mGoogleClient = new GoogleApiClient.Builder(this)
@@ -86,6 +88,7 @@ public class MapsActivity extends AppCompatActivity implements
         inflater.inflate(R.menu.menu, menu);
 
         return super.onCreateOptionsMenu(menu);
+
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
