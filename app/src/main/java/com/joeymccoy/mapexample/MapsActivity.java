@@ -1,5 +1,7 @@
 package com.joeymccoy.mapexample;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -23,11 +25,15 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -40,6 +46,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MapsActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -64,7 +73,8 @@ public class MapsActivity extends AppCompatActivity implements
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         ActionBar supportActionBar = getSupportActionBar();
-        supportActionBar.setLogo(R.drawable.ic_app_icon);
+        supportActionBar.setLogo(R.drawable.ic_action_web_site);
+
 
 
         mGoogleClient = new GoogleApiClient.Builder(this)
@@ -80,6 +90,37 @@ public class MapsActivity extends AppCompatActivity implements
                 .setInterval(60*1000)       //10 seconds
                 .setFastestInterval(1*1000);//1 second
 
+    }
+    public void onSearch(View view)
+    {
+        EditText location_tf = (EditText)findViewById(R.id.TFaddress);
+        String location = location_tf.getText().toString();
+        List<Address> addressList = null;
+        if(location !=null || !location.equals(""))
+        {
+            Geocoder geocoder = new Geocoder(this);
+            try{
+                addressList = geocoder.getFromLocationName(location,1);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Address address = addressList.get(0);
+            LatLng latLng = new LatLng(address.getLatitude(),address.getLongitude());
+            mMap.clear();
+            mMap.addMarker(new MarkerOptions().position(latLng).title("Location"));
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+            Toast.makeText(getApplicationContext(),
+                    String.valueOf("New Location: " + address.getLatitude() + "," + address.getLongitude()),
+                    Toast.LENGTH_LONG).show();
+            Log.d("New Lat = ", Double.toString(address.getLatitude()));
+            Log.d("New Long = ", Double.toString(address.getLongitude()));
+        }
+        InputMethodManager inputManager = (InputMethodManager)
+                getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        inputManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -101,6 +142,9 @@ public class MapsActivity extends AppCompatActivity implements
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
+
+
+
     }
     @Override
     protected void onResume() {
@@ -145,21 +189,6 @@ public class MapsActivity extends AppCompatActivity implements
 
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
     private void setUpMapIfNeeded() {
 
         // Do a null check to confirm that we have not already instantiated the map.
@@ -169,6 +198,7 @@ public class MapsActivity extends AppCompatActivity implements
                     .getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
+
                 //setUpMap();
             }
         }
